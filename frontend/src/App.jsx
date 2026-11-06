@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import LoginModal from './components/LoginModal';
 import ETicketModal from './components/ETicketModal';
+import HomePage from './pages/HomePage';
 import SearchTripsPage from './pages/SearchTripsPage';
 import MyBookingsPage from './pages/MyBookingsPage';
 import PnrLookupPage from './pages/PnrLookupPage';
@@ -12,7 +13,7 @@ import { api } from './services/api';
 
 function MainApp() {
   const { user } = useAuth();
-  const [currentView, setCurrentView] = useState('search');
+  const [currentView, setCurrentView] = useState('home');
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [activeTicket, setActiveTicket] = useState(null);
 
@@ -36,6 +37,14 @@ function MainApp() {
       />
 
       <main className="main-layout" style={{ flex: 1 }}>
+        {currentView === 'home' && (
+          <HomePage
+            onBookingSuccess={handleBookingSuccess}
+            openLoginModal={() => setIsLoginOpen(true)}
+            onNavigate={(view) => setCurrentView(view)}
+          />
+        )}
+
         {currentView === 'search' && (
           <SearchTripsPage
             onBookingSuccess={handleBookingSuccess}
@@ -62,15 +71,20 @@ function MainApp() {
         )}
       </main>
 
-      <footer style={{ background: '#0f172a', color: '#94a3b8', padding: '24px 20px', fontSize: '0.82rem', borderTop: '1px solid #1e293b' }}>
-        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+      <footer style={{ background: '#1c1917', color: '#a8a29e', padding: '32px 20px', fontSize: '0.85rem', borderTop: '1px solid #292524' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
           <div>
-            <span style={{ fontWeight: 700, color: '#f8fafc' }}>Bus Booking Management System</span> — Full-stack Modular Monolith with RBAC, ACID Seat Integrity, Policy Engine & Manifest Reporting
+            <div style={{ fontWeight: 800, color: '#f5f5f4', fontSize: '1rem', marginBottom: 4 }}>
+              GreenTrail Express — Bus Booking Management System
+            </div>
+            <div style={{ color: '#78716c' }}>
+              Full-Stack Modular Monolith with RBAC, ACID Seat Integrity, Policy Engine & Manifest Reporting
+            </div>
           </div>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <span style={{ color: '#4ade80' }}>● SQLite WAL Mode Active</span>
-            <span>Zero External Dependencies</span>
-            <span>Student Engineering Submission</span>
+          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+            <span style={{ color: '#10b981', fontWeight: 600 }}>● SQLite WAL Mode Active</span>
+            <span>Zero External Setup</span>
+            <span style={{ color: '#f59e0b', fontWeight: 600 }}>Student Engineering Project</span>
           </div>
         </div>
       </footer>

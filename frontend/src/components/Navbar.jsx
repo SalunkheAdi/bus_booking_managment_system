@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Bus, User, LogOut, Shield, Briefcase, Ticket, Search, CheckCircle } from 'lucide-react';
+import { Bus, User, LogOut, Shield, Briefcase, Ticket, Search, Home } from 'lucide-react';
 
 export default function Navbar({ currentView, setCurrentView, openLoginModal }) {
   const { user, logout, quickSwitch, demoAccounts } = useAuth();
@@ -10,8 +10,8 @@ export default function Navbar({ currentView, setCurrentView, openLoginModal }) 
       {/* Reviewer Quick Switcher Banner */}
       <div className="reviewer-banner">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span style={{ fontWeight: 600 }}>🎓 Reviewer Quick Switcher:</span>
-          <span>Switch roles instantly with 1-click to test the journeys:</span>
+          <span style={{ fontWeight: 700 }}>🎓 Reviewer Quick Switcher:</span>
+          <span style={{ color: '#d6d3d1' }}>Switch roles with 1-click to test the journeys:</span>
         </div>
         <div className="btn-group">
           {demoAccounts.map(account => (
@@ -28,7 +28,7 @@ export default function Navbar({ currentView, setCurrentView, openLoginModal }) 
             </button>
           ))}
           {user && (
-            <button onClick={logout} className="btn-demo-switch" style={{ background: '#7f1d1d' }}>
+            <button onClick={logout} className="btn-demo-switch" style={{ background: '#7f1d1d', borderColor: '#991b1b' }}>
               <LogOut size={12} style={{ display: 'inline', marginRight: 2 }} /> Logout
             </button>
           )}
@@ -38,12 +38,21 @@ export default function Navbar({ currentView, setCurrentView, openLoginModal }) 
       {/* Main Navigation Header */}
       <header className="app-header">
         <div className="header-container">
-          <div className="brand-logo" onClick={() => setCurrentView('search')}>
+          <div className="brand-logo" onClick={() => setCurrentView('home')}>
             <Bus size={28} />
-            <span>BusGo <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>Express</span></span>
+            <span>
+              GreenTrail <span className="brand-subtitle">Express</span>
+            </span>
           </div>
 
           <nav className="nav-links">
+            <button
+              className={`nav-btn ${currentView === 'home' ? 'active' : ''}`}
+              onClick={() => setCurrentView('home')}
+            >
+              <Home size={16} /> Home
+            </button>
+
             <button
               className={`nav-btn ${currentView === 'search' ? 'active' : ''}`}
               onClick={() => setCurrentView('search')}
@@ -89,7 +98,7 @@ export default function Navbar({ currentView, setCurrentView, openLoginModal }) 
               {user ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                   <div style={{ textAlign: 'right', lineHeight: 1.2 }}>
-                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{user.name}</div>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 700 }}>{user.name}</div>
                     <span className={`badge-role ${user.role.toLowerCase()}`}>{user.role}</span>
                   </div>
                   <button onClick={logout} className="btn btn-outline btn-sm" title="Log Out">
