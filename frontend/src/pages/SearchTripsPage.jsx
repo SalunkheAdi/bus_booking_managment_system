@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { Search, Calendar, MapPin, Bus, Clock, ShieldCheck, ArrowRight, Check } from 'lucide-react';
 import SeatSelectorModal from '../components/SeatSelectorModal';
+import RouteJourneyAnimation from '../components/RouteJourneyAnimation';
 
 export default function SearchTripsPage({ onBookingSuccess, openLoginModal }) {
   const [cities, setCities] = useState([]);
@@ -220,14 +221,12 @@ export default function SearchTripsPage({ onBookingSuccess, openLoginModal }) {
                   </div>
                 </div>
 
-                <div style={{ textAlign: 'center' }}>
-                  <div className="trip-duration-pill">
-                    <Clock size={12} style={{ display: 'inline', marginRight: 4 }} />
-                    {Math.floor(trip.estimated_duration_mins / 60)}h {trip.estimated_duration_mins % 60}m
-                  </div>
-                  <div style={{ fontSize: '0.7rem', color: '#94a3b8', marginTop: 2 }}>
-                    {trip.distance_km} km
-                  </div>
+                {/* Animated Bus Transit Line: Bus drives left-to-right, then displays duration & distance */}
+                <div style={{ textAlign: 'center', width: '100%', minWidth: 160, maxWidth: 260 }}>
+                  <RouteJourneyAnimation
+                    durationMins={trip.estimated_duration_mins}
+                    distanceKm={trip.distance_km}
+                  />
                 </div>
 
                 <div style={{ textAlign: 'right' }}>

@@ -20,6 +20,7 @@ import {
   Check
 } from 'lucide-react';
 import SeatSelectorModal from '../components/SeatSelectorModal';
+import RouteJourneyAnimation from '../components/RouteJourneyAnimation';
 
 export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate }) {
   const [cities, setCities] = useState([]);
@@ -328,14 +329,13 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
                       </div>
                     </div>
 
-                    <div style={{ textAlign: 'center' }}>
-                      <div className="trip-duration-pill">
-                        <Clock size={12} style={{ display: 'inline', marginRight: 4 }} />
-                        {Math.floor(trip.estimated_duration_mins / 60)}h {trip.estimated_duration_mins % 60}m
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: '#94a3b8', marginTop: 4 }}>
-                        {trip.distance_km} km direct
-                      </div>
+                    {/* Animated Journey Track: Bus drives across, then reveals duration & distance */}
+                    <div style={{ textAlign: 'center', width: '100%', minWidth: 160, maxWidth: 260 }}>
+                      <RouteJourneyAnimation
+                        durationMins={trip.estimated_duration_mins}
+                        distanceKm={trip.distance_km}
+                        delay={0}
+                      />
                     </div>
 
                     <div style={{ textAlign: 'right' }}>
