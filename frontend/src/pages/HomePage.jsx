@@ -14,7 +14,10 @@ import {
   Sparkles,
   Compass,
   Award,
-  Clock
+  Clock,
+  Wifi,
+  Coffee,
+  Check
 } from 'lucide-react';
 import SeatSelectorModal from '../components/SeatSelectorModal';
 
@@ -29,12 +32,9 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
 
   useEffect(() => {
     loadCities();
-    // Pre-populate with tomorrow's date
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     setDate(tomorrow.toISOString().split('T')[0]);
-
-    // Initial trip fetch
     fetchFeaturedTrips();
   }, []);
 
@@ -64,7 +64,6 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
   function handleSearchSubmit(e) {
     e.preventDefault();
     fetchFeaturedTrips(origin, destination, date);
-    // Scroll down smoothly to trips section
     const el = document.getElementById('trips-section');
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   }
@@ -79,25 +78,83 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
 
   return (
     <div>
-      {/* Natural Hero Section */}
+      {/* Natural Hero Section with Real Luxury Bus Image */}
       <section className="natural-hero">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <Sparkles size={14} style={{ color: '#f59e0b' }} />
-            <span>Reliable & Verified Intercity Travel</span>
+        <div className="hero-content" style={{ maxWidth: 1140 }}>
+          <div className="hero-two-column">
+            {/* Left Column: Heading, Subheading & Form */}
+            <div style={{ textAlign: 'left' }}>
+              <div className="hero-badge">
+                <Sparkles size={14} style={{ color: '#f59e0b' }} />
+                <span>Verified Intercity Luxury Coach Fleet</span>
+              </div>
+
+              <h1 className="hero-heading" style={{ fontSize: '2.4rem', textAlign: 'left' }}>
+                Travel Safely, <br />
+                <span className="hero-accent">Book Seats with Cutaway View</span>
+              </h1>
+
+              <p className="hero-subheading" style={{ textAlign: 'left', margin: '0 0 20px 0', fontSize: '0.98rem' }}>
+                Real-time 2D visual bus cabin cutaways, zero double-booking concurrency guarantees, and instant electronic PNR boarding tickets.
+              </p>
+
+              {/* Quick Route Pills */}
+              <div className="popular-routes-pills" style={{ marginTop: 0, marginBottom: 12 }}>
+                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: '#ccfbf1' }}>
+                  Popular Journeys:
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleQuickRoute('New York', 'Boston')}
+                  className="route-pill"
+                  style={{ background: 'rgba(255,255,255,0.15)', color: 'white', borderColor: 'rgba(255,255,255,0.25)' }}
+                >
+                  New York → Boston
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickRoute('New York', 'Washington DC')}
+                  className="route-pill"
+                  style={{ background: 'rgba(255,255,255,0.15)', color: 'white', borderColor: 'rgba(255,255,255,0.25)' }}
+                >
+                  New York → Washington DC
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleQuickRoute('Philadelphia', 'New York')}
+                  className="route-pill"
+                  style={{ background: 'rgba(255,255,255,0.15)', color: 'white', borderColor: 'rgba(255,255,255,0.25)' }}
+                >
+                  Philadelphia → New York
+                </button>
+              </div>
+            </div>
+
+            {/* Right Column: Real Luxury Coach Photo */}
+            <div className="hero-bus-image-wrapper">
+              <img
+                src="/images/luxury-bus-hero.jpg"
+                alt="Luxury Intercity Bus"
+                className="hero-bus-img"
+              />
+              <div className="hero-floating-tag">
+                <ShieldCheck size={14} /> 100% Verified Fleet
+              </div>
+              <div className="hero-bus-overlay-badge">
+                <div>
+                  <div style={{ fontWeight: 800, fontSize: '0.95rem' }}>Luxury Air-Conditioned Coach</div>
+                  <div style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>High-Speed WiFi • USB Charging • Reclining Seats</div>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontSize: '0.7rem', color: '#94a3b8' }}>From</div>
+                  <div style={{ fontWeight: 800, fontSize: '1.2rem', color: '#38bdf8' }}>$34.00</div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          <h1 className="hero-heading">
-            Travel Comfortably, <br />
-            <span className="hero-accent">Book Your Seats Live</span>
-          </h1>
-
-          <p className="hero-subheading">
-            Discover dependable bus operators, select your window or aisle seat in real time, and enjoy zero double-booking integrity with fair, transparent cancellation policies.
-          </p>
-
           {/* Integrated Search Box */}
-          <div className="hero-search-box">
+          <div className="hero-search-box" style={{ marginTop: 24 }}>
             <form onSubmit={handleSearchSubmit} className="search-form-grid">
               <div className="form-group">
                 <label className="form-label dark" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -140,49 +197,13 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
               </div>
 
               <button type="submit" className="btn btn-primary" style={{ height: 44, fontWeight: 700 }}>
-                <Search size={18} /> Find Buses
+                <Search size={18} /> Find Departures
               </button>
             </form>
 
             <datalist id="cities-list-home">
               {cities.map(c => <option key={c} value={c} />)}
             </datalist>
-
-            {/* Quick Route Pills */}
-            <div className="popular-routes-pills">
-              <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)' }}>
-                Popular Journeys:
-              </span>
-              <button
-                type="button"
-                onClick={() => handleQuickRoute('New York', 'Boston')}
-                className="route-pill"
-              >
-                New York → Boston
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickRoute('New York', 'Washington DC')}
-                className="route-pill"
-              >
-                New York → Washington DC
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickRoute('Philadelphia', 'New York')}
-                className="route-pill"
-              >
-                Philadelphia → New York
-              </button>
-              <button
-                type="button"
-                onClick={() => { setOrigin(''); setDestination(''); fetchFeaturedTrips('', '', ''); }}
-                className="route-pill"
-                style={{ background: '#f1f5f9', color: 'var(--text-main)' }}
-              >
-                Show All Trips
-              </button>
-            </div>
           </div>
         </div>
       </section>
@@ -193,9 +214,9 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
           <div className="feature-icon-box" style={{ background: '#ecfdf5', color: '#047857' }}>
             <Zap size={22} />
           </div>
-          <h3 className="feature-title">Live 2D Seat Selection</h3>
+          <h3 className="feature-title">Bus Cutaway Seat Animation</h3>
           <p className="feature-desc">
-            Visual bus layout showing window, aisle, and sleeper berths with instant real-time availability.
+            Click any trip to see the exterior bus body slice open into an internal cabin floorplan with real-time seat availability.
           </p>
         </div>
 
@@ -205,7 +226,7 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
           </div>
           <h3 className="feature-title">Guaranteed Seat Integrity</h3>
           <p className="feature-desc">
-            Multi-layered ACID database transactions and unique constraints eliminate double-booking risks.
+            Atomic database locks and unique constraints prevent duplicate tickets even under simultaneous customer requests.
           </p>
         </div>
 
@@ -215,7 +236,7 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
           </div>
           <h3 className="feature-title">Fair & Dynamic Refunds</h3>
           <p className="feature-desc">
-            Transparent cancellation policies with automatic refund calculations based on time before departure.
+            Configurable cancellation policy tiers with instant simulated refunds based on exact time remaining before departure.
           </p>
         </div>
 
@@ -223,22 +244,22 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
           <div className="feature-icon-box" style={{ background: '#f8fafc', color: '#334155' }}>
             <Users size={22} />
           </div>
-          <h3 className="feature-title">Verified Manifests & Staff Portal</h3>
+          <h3 className="feature-title">Verified Operator Portals</h3>
           <p className="feature-desc">
-            Comprehensive passenger manifests, occupancy tracking, and scheduled fleet management for operators.
+            Staff manifests, route occupancy tracking, and real-time reconciliation for bus operators and ticket conductors.
           </p>
         </div>
       </section>
 
       {/* Trips Section */}
-      <section id="trips-section" style={{ marginTop: 40 }}>
+      <section id="trips-section" style={{ marginTop: 36 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
           <div>
             <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-main)' }}>
               Scheduled Departures & Available Seats
             </h2>
             <p style={{ fontSize: '0.88rem', color: 'var(--text-muted)' }}>
-              {origin && destination ? `Showing departures for ${origin} → ${destination}` : 'Browse all upcoming routes and real-time seat inventories'}
+              {origin && destination ? `Showing services for ${origin} → ${destination}` : 'Click "Select Seats" to view the animated cabin cutaway'}
             </p>
           </div>
 
@@ -345,9 +366,10 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
                         disabled={avail === 0}
                         onClick={() => setSelectedTrip(trip)}
                         className="btn btn-primary btn-sm"
-                        style={{ padding: '8px 16px', borderRadius: 8 }}
+                        style={{ padding: '8px 16px', borderRadius: 8, display: 'flex', alignItems: 'center', gap: 6 }}
                       >
-                        Select Seats <ArrowRight size={14} />
+                        <span>Select Seats</span>
+                        <ArrowRight size={14} />
                       </button>
                     </div>
                   </div>
@@ -358,43 +380,7 @@ export default function HomePage({ onBookingSuccess, openLoginModal, onNavigate 
         )}
       </section>
 
-      {/* How It Works 3-Step Journey */}
-      <section className="how-it-works-section">
-        <div style={{ textAlign: 'center', marginBottom: 32 }}>
-          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--primary)', letterSpacing: 1, textTransform: 'uppercase' }}>
-            Simple Booking Process
-          </span>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: 800, marginTop: 4 }}>How It Works in 3 Easy Steps</h2>
-        </div>
-
-        <div className="steps-grid">
-          <div className="step-card">
-            <div className="step-number">1</div>
-            <h4 style={{ fontWeight: 700, marginBottom: 6 }}>Search Your Journey</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Choose your origin, destination, and travel date to browse live schedules and pricing.
-            </p>
-          </div>
-
-          <div className="step-card">
-            <div className="step-number">2</div>
-            <h4 style={{ fontWeight: 700, marginBottom: 6 }}>Select Your Seat</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Inspect the interactive 2D cabin map and pick your favorite window, aisle, or sleeper berth.
-            </p>
-          </div>
-
-          <div className="step-card">
-            <div className="step-number">3</div>
-            <h4 style={{ fontWeight: 700, marginBottom: 6 }}>Instant E-Ticket & PNR</h4>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Confirm your booking with atomic locking and instantly download or print your official boarding pass.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Seat Selector Modal */}
+      {/* Seat Selector Modal with Animated Cutaway */}
       {selectedTrip && (
         <SeatSelectorModal
           trip={selectedTrip}

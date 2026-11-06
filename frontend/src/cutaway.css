@@ -1,0 +1,235 @@
+/* --- BUS CUTAWAY & SLICE ANIMATION --- */
+
+@keyframes laserSweep {
+  0% {
+    top: 0%;
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes seatPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+  70% {
+    transform: scale(1.08) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes splitLeft {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-40px) rotate(-4deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@keyframes splitRight {
+  0% {
+    transform: translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(40px) rotate(4deg);
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+@keyframes chassisGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(15, 118, 110, 0.15);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(15, 118, 110, 0.35);
+  }
+}
+
+.cutaway-container {
+  position: relative;
+  margin: 0 auto;
+  border-radius: 26px 26px 16px 16px;
+  overflow: hidden;
+  background: #fbfbf9;
+  border: 2px solid #0f766e;
+  animation: chassisGlow 3s infinite ease-in-out;
+  padding: 16px;
+  width: 320px;
+}
+
+/* Slicing Laser Beam */
+.slicing-laser {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #10b981, #f59e0b, #10b981, transparent);
+  box-shadow: 0 0 12px #10b981, 0 0 20px #f59e0b;
+  z-index: 10;
+  animation: laserSweep 1.2s ease-out forwards;
+}
+
+/* Cutaway Shell Overlay (the exterior roof that splits open) */
+.exterior-shell-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  display: flex;
+  pointer-events: none;
+}
+
+.shell-half-left {
+  flex: 1;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-right: 1.5px dashed rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 8px;
+  color: #94a3b8;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shell-half-right {
+  flex: 1;
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+  border-left: 1.5px dashed rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 8px;
+  color: #94a3b8;
+  transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cutaway-active .shell-half-left {
+  transform: translateX(-110%) rotate(-6deg);
+  opacity: 0;
+}
+
+.cutaway-active .shell-half-right {
+  transform: translateX(110%) rotate(6deg);
+  opacity: 0;
+}
+
+/* Interior Cabin Flooring */
+.cabin-interior {
+  position: relative;
+  z-index: 5;
+  transition: all 0.5s ease;
+}
+
+.cutaway-active .cabin-interior {
+  opacity: 1;
+}
+
+.cutaway-active .seat-btn {
+  animation: seatPopIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+/* Stagger seat pop-in animations */
+.cutaway-active .bus-seat-row:nth-child(1) .seat-btn { animation-delay: 0.1s; }
+.cutaway-active .bus-seat-row:nth-child(2) .seat-btn { animation-delay: 0.15s; }
+.cutaway-active .bus-seat-row:nth-child(3) .seat-btn { animation-delay: 0.2s; }
+.cutaway-active .bus-seat-row:nth-child(4) .seat-btn { animation-delay: 0.25s; }
+.cutaway-active .bus-seat-row:nth-child(5) .seat-btn { animation-delay: 0.3s; }
+.cutaway-active .bus-seat-row:nth-child(6) .seat-btn { animation-delay: 0.35s; }
+.cutaway-active .bus-seat-row:nth-child(7) .seat-btn { animation-delay: 0.4s; }
+
+/* Cockpit windshield header */
+.bus-cockpit-cutaway {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px dashed #0d9488;
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+  background: #f0fdfa;
+  border-radius: 12px;
+  padding: 8px 12px;
+}
+
+/* Home Page Hero Graphic with Real Bus */
+.hero-two-column {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 36px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .hero-two-column {
+    grid-template-columns: 1fr;
+  }
+}
+
+.hero-bus-image-wrapper {
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 20px 35px -5px rgba(0, 0, 0, 0.35);
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s ease;
+}
+
+.hero-bus-image-wrapper:hover {
+  transform: translateY(-4px) scale(1.02);
+}
+
+.hero-bus-img {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+  display: block;
+}
+
+.hero-bus-overlay-badge {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(8px);
+  color: white;
+  padding: 10px 14px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.hero-floating-tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: #0f766e;
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}

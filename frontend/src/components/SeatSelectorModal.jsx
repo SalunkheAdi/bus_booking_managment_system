@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
-import { X, Check, AlertCircle, User, ShieldCheck } from 'lucide-react';
+import { X, Check, AlertCircle, User, ShieldCheck, Sparkles, Scissors, Eye, RotateCw } from 'lucide-react';
 
 export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSuccess, openLoginModal }) {
   const { user } = useAuth();
@@ -10,6 +10,10 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+
+  // Slicing / Cutaway animation state
+  const [isCutaway, setIsCutaway] = useState(false);
+  const [animatingSlice, setAnimatingSlice] = useState(false);
 
   // Form state
   const [boardingStopId, setBoardingStopId] = useState('');
@@ -24,6 +28,15 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
       loadSeats();
       setSelectedSeats([]);
       setError('');
+      setIsCutaway(false);
+      setAnimatingSlice(true);
+
+      // Trigger the dramatic bus slicing cutaway animation after 300ms
+      const timer = setTimeout(() => {
+        setIsCutaway(true);
+        setAnimatingSlice(false);
+      }, 500);
+
       if (user) {
         setContactName(user.name || '');
         setContactEmail(user.email || '');
@@ -35,6 +48,8 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
       if (trip.drop_points && trip.drop_points.length > 0) {
         setDropStopId(trip.drop_points[0].id);
       }
+
+      return () => clearTimeout(timer);
     }
   }, [isOpen, trip, user]);
 
@@ -50,6 +65,15 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
     } finally {
       setLoading(false);
     }
+  }
+
+  function replayCutawayAnimation() {
+    setIsCutaway(false);
+    setAnimatingSlice(true);
+    setTimeout(() => {
+      setIsCutaway(true);
+      setAnimatingSlice(false);
+    }, 450);
   }
 
   function toggleSeat(seatNumber, status) {
@@ -102,7 +126,6 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
       return;
     }
 
-    // Validate passengers
     for (const seatNum of selectedSeats) {
       const p = passengerDetails[seatNum];
       if (!p || !p.passengerName || !p.passengerName.trim()) {
@@ -142,7 +165,6 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
       }
     } catch (err) {
       setError(err.message || 'Booking failed');
-      // If seat was taken by someone else, reload seat layout!
       if (err.message.includes('already booked')) {
         loadSeats();
       }
@@ -169,14 +191,31 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
       <div className="seat-picker-content">
         <div className="seat-picker-header">
           <div>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>Select Seats & Passenger Details</h3>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              {trip.operator_name} • {trip.bus_type} • {trip.source_city} → {trip.destination_city} (${trip.base_fare} / seat)
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <h3 style={{ fontSize: '1.25rem', fontWeight: 800 }}>Cabin Cutaway & Seat Selection</h3>
+              <span className="badge-role customer" style={{ fontSize: '0.7rem' }}>
+                X-Ray Cutaway
+              </span>
+            </div>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 2 }}>
+              {trip.operator_name} • Fleet #{trip.bus_number} • {trip.source_city} → {trip.destination_city} (${trip.base_fare}/seat)
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <X size={22} />
-          </button>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <button
+              type="button"
+              onClick={replayCutawayAnimation}
+              className="btn btn-outline btn-sm"
+              title="Replay Bus Cutting Animation"
+              style={{ fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: 5 }}
+            >
+              <RotateCw size={13} /> Replay Cutaway
+            </button>
+            <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
+              <X size={22} />
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -188,83 +227,114 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
 
         {loading ? (
           <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
-            Loading seat layout...
+            Loading cabin floorplan...
           </div>
         ) : (
           <form onSubmit={handleConfirmBooking} className="seat-layout-grid-wrap">
-            {/* Visual Bus Seat Map */}
+            {/* Cutaway Animated Bus Chassis */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <div className="bus-chassis">
-                {/* Cockpit / Steering wheel */}
-                <div className="cockpit">
-                  <div style={{ fontSize: '0.75rem', fontWeight: 600, color: '#64748b', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span>FRONT / DRIVER</span>
-                    <span style={{ fontSize: '1.1rem' }}>🛞</span>
+              {/* Cutaway Status Pill */}
+              <div style={{ marginBottom: 10, display: 'flex', alignItems: 'center', gap: 6, fontSize: '0.78rem', color: 'var(--primary)', fontWeight: 700, background: 'var(--primary-light)', padding: '3px 10px', borderRadius: 9999 }}>
+                <Scissors size={12} />
+                <span>{isCutaway ? 'Roof Peeled Open — Cabin Interior Exposed' : 'Exterior Slicing In Progress...'}</span>
+              </div>
+
+              <div className={`cutaway-container ${isCutaway ? 'cutaway-active' : ''}`}>
+                {/* Slicing Laser Sweep Line */}
+                {animatingSlice && <div className="slicing-laser" />}
+
+                {/* Splitting Exterior Body Shell Overlay */}
+                <div className="exterior-shell-overlay">
+                  <div className="shell-half-left">
+                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#38bdf8' }}>ROOF SHELL [L]</div>
+                    <div style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.8 }}>🚌 EXTERIOR</div>
+                    <div style={{ fontSize: '0.65rem' }}>{trip.operator_name}</div>
+                  </div>
+                  <div className="shell-half-right">
+                    <div style={{ fontSize: '0.65rem', fontWeight: 800, color: '#38bdf8', textAlign: 'right' }}>ROOF SHELL [R]</div>
+                    <div style={{ textAlign: 'center', fontSize: '0.8rem', opacity: 0.8 }}>AIR-CON UNIT</div>
+                    <div style={{ fontSize: '0.65rem', textAlign: 'right' }}>FLEET #{trip.bus_number}</div>
                   </div>
                 </div>
 
-                {/* Seat Matrix */}
-                <div className="bus-seat-grid-2x2">
-                  {rowNumbers.map(rNum => {
-                    const rowSeats = rowsMap[rNum] || [];
-                    const seatA = rowSeats.find(s => s.col_num === 1);
-                    const seatB = rowSeats.find(s => s.col_num === 2);
-                    const seatC = rowSeats.find(s => s.col_num === 3);
-                    const seatD = rowSeats.find(s => s.col_num === 4);
+                {/* Interior Cabin Under Cutaway */}
+                <div className="cabin-interior">
+                  {/* Driver Cockpit */}
+                  <div className="bus-cockpit-cutaway">
+                    <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--primary)' }}>
+                      FRONT CABIN / ENTRY
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.75rem', fontWeight: 700, color: '#475569' }}>
+                      <span>DRIVER</span>
+                      <span style={{ fontSize: '1.1rem' }}>🛞</span>
+                    </div>
+                  </div>
 
-                    return (
-                      <div key={rNum} className="bus-seat-row">
-                        {/* Left pair (A, B) */}
-                        {seatA ? (
-                          <button
-                            type="button"
-                            onClick={() => toggleSeat(seatA.seat_number, seatA.status)}
-                            className={`seat-btn ${seatA.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatA.seat_number) ? 'selected' : ''}`}
-                            title={`Seat ${seatA.seat_number} (${seatA.status})`}
-                          >
-                            {seatA.seat_number}
-                          </button>
-                        ) : <div />}
+                  {/* Seat Matrix with animated stagger */}
+                  <div className="bus-seat-grid-2x2">
+                    {rowNumbers.map(rNum => {
+                      const rowSeats = rowsMap[rNum] || [];
+                      const seatA = rowSeats.find(s => s.col_num === 1);
+                      const seatB = rowSeats.find(s => s.col_num === 2);
+                      const seatC = rowSeats.find(s => s.col_num === 3);
+                      const seatD = rowSeats.find(s => s.col_num === 4);
 
-                        {seatB ? (
-                          <button
-                            type="button"
-                            onClick={() => toggleSeat(seatB.seat_number, seatB.status)}
-                            className={`seat-btn ${seatB.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatB.seat_number) ? 'selected' : ''}`}
-                            title={`Seat ${seatB.seat_number} (${seatB.status})`}
-                          >
-                            {seatB.seat_number}
-                          </button>
-                        ) : <div />}
+                      return (
+                        <div key={rNum} className="bus-seat-row">
+                          {/* Left Seats (A, B) */}
+                          {seatA ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSeat(seatA.seat_number, seatA.status)}
+                              className={`seat-btn ${seatA.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatA.seat_number) ? 'selected' : ''}`}
+                              title={`Seat ${seatA.seat_number} (${seatA.status})`}
+                            >
+                              {seatA.seat_number}
+                            </button>
+                          ) : <div />}
 
-                        {/* Aisle */}
-                        <div className="aisle-gap">|</div>
+                          {seatB ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSeat(seatB.seat_number, seatB.status)}
+                              className={`seat-btn ${seatB.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatB.seat_number) ? 'selected' : ''}`}
+                              title={`Seat ${seatB.seat_number} (${seatB.status})`}
+                            >
+                              {seatB.seat_number}
+                            </button>
+                          ) : <div />}
 
-                        {/* Right pair (C, D) */}
-                        {seatC ? (
-                          <button
-                            type="button"
-                            onClick={() => toggleSeat(seatC.seat_number, seatC.status)}
-                            className={`seat-btn ${seatC.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatC.seat_number) ? 'selected' : ''}`}
-                            title={`Seat ${seatC.seat_number} (${seatC.status})`}
-                          >
-                            {seatC.seat_number}
-                          </button>
-                        ) : <div />}
+                          {/* Center Aisle */}
+                          <div className="aisle-gap">
+                            <span style={{ fontSize: '0.65rem', color: '#94a3b8' }}>|</span>
+                          </div>
 
-                        {seatD ? (
-                          <button
-                            type="button"
-                            onClick={() => toggleSeat(seatD.seat_number, seatD.status)}
-                            className={`seat-btn ${seatD.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatD.seat_number) ? 'selected' : ''}`}
-                            title={`Seat ${seatD.seat_number} (${seatD.status})`}
-                          >
-                            {seatD.seat_number}
-                          </button>
-                        ) : <div />}
-                      </div>
-                    );
-                  })}
+                          {/* Right Seats (C, D) */}
+                          {seatC ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSeat(seatC.seat_number, seatC.status)}
+                              className={`seat-btn ${seatC.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatC.seat_number) ? 'selected' : ''}`}
+                              title={`Seat ${seatC.seat_number} (${seatC.status})`}
+                            >
+                              {seatC.seat_number}
+                            </button>
+                          ) : <div />}
+
+                          {seatD ? (
+                            <button
+                              type="button"
+                              onClick={() => toggleSeat(seatD.seat_number, seatD.status)}
+                              className={`seat-btn ${seatD.status === 'BOOKED' ? 'booked' : ''} ${selectedSeats.includes(seatD.seat_number) ? 'selected' : ''}`}
+                              title={`Seat ${seatD.seat_number} (${seatD.status})`}
+                            >
+                              {seatD.seat_number}
+                            </button>
+                          ) : <div />}
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -285,19 +355,23 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
               </div>
             </div>
 
-            {/* Booking & Passenger Form Sidebar */}
+            {/* Booking Sidebar Form */}
             <div className="booking-sidebar">
-              {/* Selected Seats Banner */}
-              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 8, padding: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              {/* Fare Summary Box */}
+              <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: 10, padding: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 600 }}>SELECTED SEATS</div>
-                  <div style={{ fontSize: '1.1rem', fontWeight: 700, color: '#15803d' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, letterSpacing: 0.5 }}>
+                    SELECTED SEATS
+                  </div>
+                  <div style={{ fontSize: '1.15rem', fontWeight: 800, color: '#065f46' }}>
                     {selectedSeats.length > 0 ? selectedSeats.join(', ') : 'None selected'}
                   </div>
                 </div>
                 <div style={{ textAlign: 'right' }}>
-                  <div style={{ fontSize: '0.8rem', color: '#166534', fontWeight: 600 }}>TOTAL FARE</div>
-                  <div style={{ fontSize: '1.25rem', fontWeight: 800, color: '#15803d' }}>
+                  <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, letterSpacing: 0.5 }}>
+                    TOTAL AMOUNT
+                  </div>
+                  <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#065f46' }}>
                     ${totalFare}
                   </div>
                 </div>
@@ -306,7 +380,7 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
               {/* Boarding and Drop Points */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div className="form-group">
-                  <label className="form-label dark">Boarding Point</label>
+                  <label className="form-label dark">Boarding Stop</label>
                   <select
                     className="form-select"
                     value={boardingStopId}
@@ -321,7 +395,7 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label dark">Dropping Point</label>
+                  <label className="form-label dark">Dropping Stop</label>
                   <select
                     className="form-select"
                     value={dropStopId}
@@ -337,9 +411,9 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
               </div>
 
               {/* Contact Information */}
-              <div style={{ background: '#f8fafc', padding: 12, borderRadius: 8, border: '1px solid var(--border)' }}>
-                <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 8, color: 'var(--text-main)' }}>
-                  CONTACT INFORMATION
+              <div style={{ background: '#fbfbf9', padding: 14, borderRadius: 10, border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: 8, color: 'var(--text-main)', letterSpacing: 0.5 }}>
+                  CONTACT DETAILS (TICKET DELIVERY)
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 8 }}>
                   <input
@@ -354,7 +428,7 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
                     type="tel"
                     required
                     className="form-input"
-                    placeholder="Contact Phone"
+                    placeholder="Phone Number"
                     value={contactPhone}
                     onChange={e => setContactPhone(e.target.value)}
                   />
@@ -363,7 +437,7 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
                   type="email"
                   required
                   className="form-input"
-                  placeholder="Ticket Email Address"
+                  placeholder="Email Address"
                   value={contactEmail}
                   onChange={e => setContactEmail(e.target.value)}
                 />
@@ -372,14 +446,14 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
               {/* Passenger Inputs for each selected seat */}
               {selectedSeats.length > 0 && (
                 <div>
-                  <div style={{ fontSize: '0.82rem', fontWeight: 700, marginBottom: 8, color: 'var(--text-main)' }}>
-                    PASSENGER DETAILS ({selectedSeats.length})
+                  <div style={{ fontSize: '0.8rem', fontWeight: 800, marginBottom: 8, color: 'var(--text-main)', letterSpacing: 0.5 }}>
+                    PASSENGER INFORMATION ({selectedSeats.length})
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 8, maxHeight: 180, overflowY: 'auto' }}>
                     {selectedSeats.map((seatNum, idx) => (
                       <div key={seatNum} className="passenger-entry-card">
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                          <span style={{ fontWeight: 700, fontSize: '0.82rem', color: 'var(--primary)' }}>
+                          <span style={{ fontWeight: 800, fontSize: '0.82rem', color: 'var(--primary)' }}>
                             Passenger {idx + 1} (Seat {seatNum})
                           </span>
                         </div>
@@ -418,13 +492,13 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
                 </div>
               )}
 
-              {/* Submit / Login Button */}
+              {/* Submit Button */}
               {user ? (
                 <button
                   type="submit"
                   disabled={submitting || selectedSeats.length === 0}
                   className="btn btn-primary"
-                  style={{ width: '100%', marginTop: 'auto', padding: '12px' }}
+                  style={{ width: '100%', marginTop: 'auto', padding: '13px', borderRadius: 10, fontWeight: 700 }}
                 >
                   <ShieldCheck size={18} />
                   {submitting ? 'Confirming with Atomic Lock...' : `Confirm & Pay $${totalFare}`}
@@ -434,7 +508,7 @@ export default function SeatSelectorModal({ trip, isOpen, onClose, onBookingSucc
                   type="button"
                   onClick={openLoginModal}
                   className="btn btn-primary"
-                  style={{ width: '100%', marginTop: 'auto', padding: '12px' }}
+                  style={{ width: '100%', marginTop: 'auto', padding: '13px', borderRadius: 10, fontWeight: 700 }}
                 >
                   <User size={18} /> Sign In to Book Seats
                 </button>
