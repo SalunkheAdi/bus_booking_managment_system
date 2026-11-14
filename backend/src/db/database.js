@@ -4,12 +4,24 @@ const fs = require('fs');
 require('dotenv').config();
 
 function getDatabase(customPath) {
-  const dbPath = customPath || process.env.DB_PATH || path.join(__dirname, '../../../data/bus_booking.db');
+  let dbPath = customPath || process.env.DB_PATH;
+
+  if (!dbPath) {
+    if (process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      dbPath = path.join('/tmp', 'bus_booking.db');
+    } else {
+      dbPath = path.join(__dirname, '../../../data/bus_booking.db');
+    }
+  }
 
   if (dbPath !== ':memory:') {
     const dir = path.dirname(dbPath);
     if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+      try {
+        fs.mkdirSync(dir, { recursive: true });
+      } catch (e) {
+        // In case /tmp already exists or permissions
+      }
     }
   }
 

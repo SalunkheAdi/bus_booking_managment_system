@@ -20,9 +20,8 @@
 ## 3. Code and Version
 | Field | Details |
 | :--- | :--- |
-| **Repository URL** | Local Submission Directory / Git Repository (`d:\projects\Bus Booking Management System`) |
+| **Repository URL** | `https://github.com/SalunkheAdi/bus_booking_managment_system` |
 | **Primary Branch** | `main` |
-| **Final Commit ID** | `72f553df64ad6e49de3667c763db00a443c9e275` (or latest HEAD) |
 | **Reviewer Access** | Public / Open access provided |
 
 ---
@@ -30,9 +29,9 @@
 ## 4. Demonstration
 | Field | Details |
 | :--- | :--- |
-| **Demonstration Type** | **Local-Only Demonstration Declared** (Zero-cost, fully reproducible setup with built-in reviewer 1-click account switcher) |
+| **Demonstration Type** | Vercel Cloud Deployment Ready & Local Demo with 1-click reviewer switcher |
 | **Walkthrough Video Link** | [Link to 3–5 Minute Video Walkthrough Demo / Loom placeholder] |
-| **Live Web Demo URL** | Declared Local-Only Demo (Run locally via `npm install && npm run seed && npm start`) |
+| **Live Web Demo URL** | Deployable to Vercel via GitHub; local run via `npm install && npm start` |
 
 ---
 

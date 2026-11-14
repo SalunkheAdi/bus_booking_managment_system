@@ -112,6 +112,20 @@ The application will launch on **`http://localhost:5000`**.
 > - Terminal 1: `npm start` (Backend API on port 5000)
 > - Terminal 2: `cd frontend && npm run dev` (Vite dev server on `http://localhost:3000` proxying to 5000)
 
+### Cloud Deployment to Vercel
+The repository is fully configured for **1-click Vercel deployment**:
+- **`vercel.json`**: Configured with static frontend output (`frontend/dist`) and serverless API routing (`/api/*` -> `api/index.js`).
+- **`api/index.js`**: Serverless entry point with automatic database initialization and demo data seeding on serverless cold starts.
+- **Database in `/tmp`**: Automatically switches SQLite storage to the writable `/tmp` directory in serverless runtime environments.
+
+**How to Deploy on Vercel:**
+1. Push this repository to GitHub: `https://github.com/SalunkheAdi/bus_booking_managment_system`.
+2. Open [vercel.com](https://vercel.com), click **Add New Project**, and import this repository.
+3. Keep default settings (Vercel automatically detects `vercel.json`).
+4. Add environment variable:
+   - `JWT_SECRET`: `super-secret-bus-booking-jwt-key-2026`
+5. Click **Deploy**. Both the API and interactive frontend will be live instantly!
+
 ---
 
 ## 5. Automated Test Suite & Acceptance Verification
