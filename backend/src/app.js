@@ -34,13 +34,16 @@ function createApp(db) {
   app.use('/api/reports', createReportRoutes(db));
   app.use('/api/admin', createAdminRoutes(db));
 
-  // Serve static frontend build if present
-  const frontendDistPath = path.join(__dirname, '../../frontend/dist');
-  if (fs.existsSync(frontendDistPath)) {
-    app.use(express.static(frontendDistPath));
+  // Serve static frontend build if present (checks root dist or frontend/dist)
+  const rootDist = path.join(__dirname, '../../dist');
+  const frontendDist = path.join(__dirname, '../../frontend/dist');
+  const distPath = fs.existsSync(rootDist) ? rootDist : frontendDist;
+
+  if (fs.existsSync(distPath)) {
+    app.use(express.static(distPath));
     app.use((req, res, next) => {
       if (req.method === 'GET' && !req.path.startsWith('/api')) {
-        return res.sendFile(path.join(frontendDistPath, 'index.html'));
+        return res.sendFile(path.join(distPath, 'index.html'));
       }
       next();
     });
